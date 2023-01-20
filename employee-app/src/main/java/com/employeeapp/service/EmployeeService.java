@@ -1,13 +1,15 @@
 package com.employeeapp.service;
 
 import com.employeeapp.exceptions.EmployeeExceptions;
-import com.employeeapp.mapper.EmployeeInDTOToEmployee;
+import com.employeeapp.mapper.IMapperList;
+import com.employeeapp.model.EmployeesListAllResponse;
 import com.employeeapp.persistence.entity.Employees;
 import com.employeeapp.model.Employee;
 import com.employeeapp.persistence.entity.Genders;
 import com.employeeapp.persistence.entity.Jobs;
 import com.employeeapp.persistence.repository.EmployeeRepository;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,12 +21,18 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
 
 
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    private final IMapperList mapper;
+
+
+    public EmployeeService(EmployeeRepository employeeRepository, IMapperList mapper) {
         this.employeeRepository = employeeRepository;
+        this.mapper = mapper;
     }
 
-    public List<Employees> getEmployees() {
-        return this.employeeRepository.findAll();
+    public List<EmployeesListAllResponse> getEmployees() {
+         List<EmployeesListAllResponse> employeesResponse = mapper.mapToOuter(this.employeeRepository.findAll());
+         return employeesResponse;
+
     }
 
     public Optional<Employees> getEmployeeById(Integer id) {
@@ -51,5 +59,9 @@ public class EmployeeService {
 
     public Employees getEmployeeByNameAndLastName(String name, String lastName) {
         return this.employeeRepository.findEmployeeByNameAndLastName(name, lastName);
+    }
+
+    public List<Employees> getEmployeesByJobId(Integer jobId) {
+        return this.employeeRepository.findAllEmployeesByJobId(jobId);
     }
 }

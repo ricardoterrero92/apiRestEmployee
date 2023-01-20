@@ -43,4 +43,21 @@ public class Employees {
     @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<EmployeeWorkedHours> employeeHours = new HashSet<>();
 
+    public Employees(int id, String name, String lastName, Date birthDate, Genders gender, Jobs job, Set<EmployeeWorkedHours> employeeHours) {
+        this.id = id;
+        this.name = name;
+        this.lastName = lastName;
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.job = job;
+        this.employeeHours = employeeHours;
+    }
+
+    public Employees() {
+
+    }
+
+    public Employees(int id) {
+        this.id = id;
+    }
 }
