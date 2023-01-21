@@ -1,25 +1,25 @@
 package com.employeeapp.controller;
 
 import com.employeeapp.mapper.EmployeeDBToEmployeeCreateResponse;
-import com.employeeapp.model.Employee;
-import com.employeeapp.model.EmployeesCreateResponse;
-import com.employeeapp.model.EmployeesListAllResponse;
+import com.employeeapp.mapper.IMapperList;
+import com.employeeapp.model.*;
 import com.employeeapp.persistence.entity.Employees;
+import com.employeeapp.persistence.entity.Jobs;
 import com.employeeapp.persistence.repository.GendersRepository;
 import com.employeeapp.persistence.repository.JobsRepository;
 import com.employeeapp.service.EmployeeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.websocket.server.PathParam;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Year;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/employees")
@@ -33,11 +33,14 @@ public class EmployeeController {
 
     private final GendersRepository gendersRepository;
 
-    public EmployeeController(EmployeeService employeeService, EmployeeDBToEmployeeCreateResponse mapper, JobsRepository jobsRepository, GendersRepository gendersRepository) {
+    private final IMapperList employeeMapperList;
+
+    public EmployeeController(EmployeeService employeeService, EmployeeDBToEmployeeCreateResponse mapper, JobsRepository jobsRepository, GendersRepository gendersRepository, IMapperList employeeMapperList) {
         this.employeeService = employeeService;
         this.mapper = mapper;
         this.jobsRepository = jobsRepository;
         this.gendersRepository = gendersRepository;
+        this.employeeMapperList = employeeMapperList;
     }
 
     @GetMapping
@@ -69,7 +72,6 @@ public class EmployeeController {
         if (employeeService.getEmployeeByNameAndLastName(employee.getName(), employee.getLastName()) == null && age >= 18 &&
                 gendersRepository.findById(employee.getGenderId()).isPresent() &&
                 jobsRepository.findById(employee.getJobId()).isPresent())  {
-
             Employees employeeSaved = this.employeeService.createEmployee(employee);
             URI ubicacion = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                     .buildAndExpand(employeeSaved.getId()).toUri();
@@ -83,8 +85,47 @@ public class EmployeeController {
         return ResponseEntity.badRequest().body(employeeResponse);
     }
 
-    @GetMapping("/jobs/{id}")
-    public List<Employees> getEmployeesByJobsId(@PathVariable("jobs_id") Integer jobId) {
-        return this.employeeService.getEmployeesByJobId(jobId);
+    @GetMapping("/jobs/{jobs_id}")
+    public ResponseEntity<WrapperEmployee> getEmployeesByJobsId(@PathParam("jobs_id") Integer jobId) {
+
+        WrapperEmployee wrapperEmployee = new WrapperEmployee();
+
+        Jobs job2 = this.jobsRepository.findJobById(jobId);
+        if (job2 != null) {
+
+            Set<Employees> employees = job2.getEmployee();
+            Set<EmployeeJobResponse> employeesList = new HashSet<>();
+
+            for (Employees employee : employees) {
+                EmployeeJobResponse response = new EmployeeJobResponse();
+
+                response.setId(employee.getId());
+                response.setName(employee.getName());
+                response.setLastName(employee.getLastName());
+                response.setBirthDate(employee.getBirthDate());
+                EmployeeJob job1 = new EmployeeJob();
+                job1.setId(employee.getJob().getId());
+                job1.setName(employee.getJob().getName());
+                job1.setSalary(employee.getJob().getSalary());
+                response.setJob(job1);
+                EmployeeGender gender = new EmployeeGender();
+                gender.setId(employee.getGender().getId());
+                gender.setName(employee.getGender().getName());
+                response.setGender(gender);
+
+                employeesList.add(response);
+            }
+
+            wrapperEmployee.setEmployees(employeesList);
+            wrapperEmployee.setSuccess(true);
+
+            return ResponseEntity.ok(wrapperEmployee);
+
+        }
+
+        wrapperEmployee.setSuccess(false);
+
+        return ResponseEntity.ok(wrapperEmployee);
+
     }
 }

@@ -1,5 +1,7 @@
 package com.employeeapp.model;
 
+import com.employeeapp.persistence.entity.Genders;
+import com.employeeapp.persistence.entity.Jobs;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -7,9 +9,9 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class EmployeesListAllResponse {
+public class EmployeeJobResponse {
 
-    @JsonProperty("employee_id")
+    @JsonProperty("id")
     private Integer id;
 
     @JsonProperty("name")
@@ -18,20 +20,15 @@ public class EmployeesListAllResponse {
     @JsonProperty("last_name")
     private String lastName;
 
-    @JsonProperty("gender_id")
-    private Integer genderId;
+    @JsonProperty("gender")
+    private EmployeeGender gender;
 
-    @JsonProperty("gender_name")
-    private String genderName;
-
-    @JsonProperty("job_id")
-    private Integer jobId;
-
-    @JsonProperty("job_name")
-    private String jobName;
+    @JsonProperty("job")
+    private EmployeeJob job;
 
     @JsonProperty("birthdate")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthDate;
+
 
 }

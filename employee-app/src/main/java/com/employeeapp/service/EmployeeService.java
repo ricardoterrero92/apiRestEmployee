@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +31,22 @@ public class EmployeeService {
     }
 
     public List<EmployeesListAllResponse> getEmployees() {
-         List<EmployeesListAllResponse> employeesResponse = mapper.mapToOuter(this.employeeRepository.findAll());
+        List<Employees> emplDB = this.employeeRepository.findAll();
+        List<EmployeesListAllResponse> employeesResponse = new ArrayList<EmployeesListAllResponse>();
+
+        List<Employees> employees = new ArrayList<>();
+        for (Employees employee : emplDB) {
+            EmployeesListAllResponse response = new EmployeesListAllResponse();
+            response.setId(employee.getId());
+            response.setName(employee.getName());
+            response.setLastName(employee.getLastName());
+            response.setGenderId(employee.getGender().getId());
+            response.setGenderName(employee.getGender().getName());
+            response.setJobId(employee.getJob().getId());
+            response.setJobName(employee.getJob().getName());
+            response.setBirthDate(employee.getBirthDate());
+            employeesResponse.add(response);
+        }
          return employeesResponse;
 
     }
@@ -38,7 +54,8 @@ public class EmployeeService {
     public Optional<Employees> getEmployeeById(Integer id) {
         Optional<Employees> employeeOptional = this.employeeRepository.findById(id);
         if (employeeOptional.isEmpty()) {
-            throw new EmployeeExceptions("Employee not found", HttpStatus.NOT_FOUND);
+            //throw new EmployeeExceptions("Employee not found", HttpStatus.NOT_FOUND);
+            return null;
         }
         return employeeOptional;
     }

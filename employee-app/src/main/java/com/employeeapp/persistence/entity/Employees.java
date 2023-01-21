@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sun.istack.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -40,7 +42,9 @@ public class Employees {
     @JsonBackReference(value = "user-job")
     private Jobs job;
 
-    @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "employees", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @EqualsAndHashCode.Exclude // <<<<<<<<<<
+    @ToString.Exclude
     private Set<EmployeeWorkedHours> employeeHours = new HashSet<>();
 
     public Employees(int id, String name, String lastName, Date birthDate, Genders gender, Jobs job, Set<EmployeeWorkedHours> employeeHours) {

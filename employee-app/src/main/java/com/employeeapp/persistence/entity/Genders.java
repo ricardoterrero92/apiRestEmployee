@@ -1,6 +1,8 @@
 package com.employeeapp.persistence.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -17,7 +19,9 @@ public class Genders {
 
     private String name;
 
-    @OneToMany(mappedBy = "gender", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "gender", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @EqualsAndHashCode.Exclude // <<<<<<<<<<
+    @ToString.Exclude
     private Set<Employees> employee = new HashSet<>();
 
     public int getId() {

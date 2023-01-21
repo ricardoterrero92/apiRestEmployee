@@ -23,9 +23,13 @@ public class EmployeeWorkedHoursService {
 
         EmployeeWorkedHours employeeHourDB = new EmployeeWorkedHours();
 
-        employeeHourDB.setWorkedHours(employeeHourDB.getWorkedHours());
-        employeeHourDB.setWorkedDate(employeeHourDB.getWorkedDate());
-        employeeHourDB.setEmployees(employeeHourDB.getEmployees());
+        employeeHourDB.setWorkedHours(employeeWorkedHour.getWorkedHours());
+        employeeHourDB.setWorkedDate(employeeWorkedHour.getWorkedDate());
+
+        Employees employee = new Employees();
+        employee.setId(employeeWorkedHour.getEmployee_id());
+
+        employeeHourDB.setEmployees(employee);
 
         return this.repository.save(employeeHourDB);
     }
